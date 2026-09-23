@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project Agenda — Finish &amp; UC Code</title>
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ============ BODY ============ -->
+  <div class="app-body">
+
+    <!-- icon rail -->
+    <aside class="rail">
+      <nav class="rail-nav">
+        <button class="rail-btn is-active" type="button" title="Settings"><span class="ico" data-icon="gear"></span></button>
+      </nav>
+      <button class="rail-btn rail-logout" type="button" title="Log out"><span class="ico" data-icon="logout"></span></button>
+    </aside>
+
+    <!-- tree panel -->
+    <nav class="nav-panel">
+      <div class="nav-scroll">
+        <div class="nav-group is-open">
+          <div class="nav-group-title">FinishAndUCCode</div>
+          <a class="nav-item is-active" href="#"><span class="ico" data-icon="gear"></span> Settings</a>
+        </div>
+      </div>
+      <div class="nav-foot">Quality</div>
+    </nav>
+
+    <!-- content -->
+    <main class="content">
+      <div class="tabs" id="tabs">
+        <button class="tab is-active" type="button" data-tab="finish">FINISH &amp; UC CODE</button>
+        <button class="tab" type="button" data-tab="variables">VARIABLES</button>
+      </div>
+      <div class="view-host" id="viewHost"></div>
+    </main>
+
+  </div>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="appfoot">
+    <span>Designed and Built by Boston Project, LLC.</span>
+    <span>Copyright &copy; SIGMA 2026</span>
+  </footer>
+
+</div>
+
+<!-- overlays (modals are appended here at runtime) -->
+<div class="toast-root" id="toastRoot"></div>
+
+<script src="assets/js/icons.js"></script>
+<script src="assets/js/mock-data.js"></script>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/views/finish-form.js"></script>
+<script src="assets/js/views/finish-list.js"></script>
+<script src="assets/js/views/variables.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
