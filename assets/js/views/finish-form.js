@@ -29,8 +29,7 @@ var FinishForm = (function () {
 
     var note = '';
     if (!Store.activeOf(sec.key).length) {
-      note = '<div class="field-note">No active values yet &mdash; add them in the ' +
-             '<b>VARIABLES</b> tab.</div>';
+      note = '<div class="field-note">No values available. Add them in <b>Variables</b>.</div>';
     }
 
     return '' +
@@ -84,9 +83,7 @@ var FinishForm = (function () {
             (autoConsecutive ? ' readonly' : '') + ' autocomplete="off">' +
           '<div class="field-note">' +
             '<span data-cons-note>' +
-              (autoConsecutive
-                ? 'Generated automatically from the selected technology (Covering). '
-                : 'Manual value. ') +
+              (autoConsecutive ? 'Generated automatically. ' : 'Manual value. ') +
             '</span>' +
             '<a href="#" data-toggle-cons>' + (autoConsecutive ? 'Enter manually' : 'Use automatic') + '</a>' +
           '</div>' +
@@ -128,9 +125,7 @@ var FinishForm = (function () {
           autoConsecutive = !autoConsecutive;
           consEl.readOnly = autoConsecutive;
           toggle.textContent = autoConsecutive ? 'Enter manually' : 'Use automatic';
-          noteEl.textContent = autoConsecutive
-            ? 'Generated automatically from the selected technology (Covering). '
-            : 'Manual value. ';
+          noteEl.textContent = autoConsecutive ? 'Generated automatically. ' : 'Manual value. ';
           if (autoConsecutive) refreshConsecutive(); else consEl.focus();
           validate();
         });
@@ -155,9 +150,7 @@ var FinishForm = (function () {
           call.then(function (row) {
             close();
             return Store.refresh().then(function () {
-              UI.toast(isEdit
-                ? 'Record "' + row.name + '" updated.'
-                : 'Record "' + row.name + '" created with consecutive ' + row.consecutive + '.');
+              UI.toast('"' + row.name + '"' + (isEdit ? ' updated.' : ' created.'));
             });
           }).catch(function (err) {
             saveEl.disabled = false;

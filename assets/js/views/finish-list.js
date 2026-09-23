@@ -180,7 +180,7 @@ var FinishListView = (function () {
     a.href = URL.createObjectURL(blob);
     a.download = 'finish-and-uc-code.csv';
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    UI.toast(rows.length + ' ' + UI.plural(rows.length, 'record', 'records') + ' exported.');
+    UI.toast(rows.length + ' ' + UI.plural(rows.length, 'finish', 'finishes') + ' exported.');
   }
 
   function doImport() {
@@ -189,9 +189,7 @@ var FinishListView = (function () {
       size: 'sm',
       body:
         '<p class="muted" style="margin:0 0 14px;line-height:1.6">' +
-          'Expected columns: <b>UC CODE, CONSECUTIVE, SUPPLIER, AAMA, COVERING, DESCRIPTION</b>.<br>' +
-          'Supplier, AAMA and Covering are matched by name against the values registered in ' +
-          '<b>Variables</b>; anything that does not match is imported blank.' +
+          'Expected columns: <b>UC CODE, CONSECUTIVE, SUPPLIER, AAMA, COVERING, DESCRIPTION</b>.' +
         '</p>' +
         '<input type="file" accept=".csv,text/csv" data-file>',
       footer: '<button class="btn btn-flat" type="button" data-close>CANCEL</button>' +
@@ -215,8 +213,7 @@ var FinishListView = (function () {
             Api.finishCodes.importRows(body).then(function (res) {
               close();
               return Store.refresh().then(function () {
-                UI.toast(res.added + ' ' + UI.plural(res.added, 'record', 'records') + ' imported' +
-                  (res.unmatched ? ' — ' + res.unmatched + ' with unmatched variable values left blank.' : '.'),
+                UI.toast(res.added + ' ' + UI.plural(res.added, 'finish', 'finishes') + ' imported.',
                   res.unmatched ? 'warn' : 'success');
               });
             }).catch(function (e) { UI.toast(e.message, 'error'); });
@@ -257,13 +254,12 @@ var FinishListView = (function () {
         title: 'Delete record?',
         danger: true,
         confirmLabel: 'DELETE',
-        html: '<p><b>' + UI.esc(rec.name) + '</b> (' + UI.esc(rec.consecutive) + ') will be removed ' +
-              'from Finish &amp; UC Code.</p><p>This action cannot be undone.</p>'
+        html: '<p>This finish will be permanently deleted.</p>'
       }).then(function (yes) {
         if (!yes) return;
         Api.finishCodes.remove(id)
           .then(function () { return Store.refresh(); })
-          .then(function () { UI.toast('Record "' + rec.name + '" deleted.'); })
+          .then(function () { UI.toast('"' + rec.name + '" deleted.'); })
           .catch(function (err) { UI.toast(err.message, 'error'); });
       });
     });

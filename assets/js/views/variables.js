@@ -136,13 +136,11 @@ var VariablesView = (function () {
     namePrompt({
       title: 'New ' + sec.label + ' value',
       label: sec.label + ' value',
-      help: 'It becomes immediately available in the <b>' + UI.esc(sec.label) +
-            '</b> dropdown of the Finish &amp; UC Code form.',
       cta: 'SAVE',
       onSubmit: function (name) {
         return Api.variables.create(sec.key, name).then(function (row) {
           return Store.refresh().then(function () {
-            UI.toast('"' + row.name + '" added to ' + sec.label + '.');
+            UI.toast('"' + row.name + '" added.');
           });
         });
       }
@@ -150,22 +148,17 @@ var VariablesView = (function () {
   }
 
   function renameValue(v, sec) {
-    var used = Store.usageCount(v.id);
     namePrompt({
       title: 'Rename ' + sec.label + ' value',
       label: sec.label + ' value',
       value: v.name,
       cta: 'SAVE',
-      help: used
-        ? 'The new name replaces the current one everywhere, including the <b>' + used +
-          '</b> existing ' + UI.plural(used, 'record', 'records') + ' that use it.'
-        : 'This value is not used by any record yet.',
+      help: 'This value will be replaced in all previously registered finishes.',
       onSubmit: function (name) {
         var old = v.name;
         return Api.variables.rename(v.id, name).then(function (row) {
           return Store.refresh().then(function () {
-            UI.toast('"' + old + '" renamed to "' + row.name + '"' +
-              (used ? ' — ' + used + ' ' + UI.plural(used, 'record', 'records') + ' updated.' : '.'));
+            UI.toast('"' + old + '" renamed to "' + row.name + '".');
           });
         });
       }
@@ -174,12 +167,11 @@ var VariablesView = (function () {
 
   function toggleStatus(v, sec) {
     var off = v.status === 'disabled';
-    var used = Store.usageCount(v.id);
 
     if (off) {
       Api.variables.setStatus(v.id, 'active')
         .then(function () { return Store.refresh(); })
-        .then(function () { UI.toast('"' + v.name + '" enabled — available again for new records.'); })
+        .then(function () { UI.toast('"' + v.name + '" enabled.'); })
         .catch(function (e) { UI.toast(e.message, 'error'); });
       return;
     }
@@ -187,54 +179,24 @@ var VariablesView = (function () {
     UI.confirm({
       title: 'Disable value?',
       confirmLabel: 'DISABLE',
-      html:
-        '<p><b>' + UI.esc(v.name) + '</b> will no longer appear in the <b>' + UI.esc(sec.label) +
-        '</b> dropdown when creating new Finish &amp; UC Code records.</p>' +
-        '<p>' + (used
-          ? 'The <b>' + used + '</b> existing ' + UI.plural(used, 'record that uses', 'records that use') +
-            ' it keep their value — nothing is lost.'
-          : 'No existing record uses it at the moment.') + '</p>' +
-        '<p class="muted">You can enable it again at any time.</p>'
+      html: '<p>It will not be available for new finishes. Previously registered ' +
+            'finishes keep this value.</p>'
     }).then(function (yes) {
       if (!yes) return;
       Api.variables.setStatus(v.id, 'disabled')
         .then(function () { return Store.refresh(); })
-        .then(function () {
-          UI.toast('"' + v.name + '" disabled — hidden for new records, historical data kept.');
-        })
+        .then(function () { UI.toast('"' + v.name + '" disabled.'); })
         .catch(function (e) { UI.toast(e.message, 'error'); });
     });
   }
 
   function deleteValue(v, sec) {
-    var records = Store.usage(v.id);
-    var used = records.length;
-
-    var impact = '';
-    if (used) {
-      var list = records.slice(0, 8).map(function (r) {
-        return '<li><b>' + UI.esc(r.name) + '</b> &middot; ' + UI.esc(r.consecutive) + '</li>';
-      }).join('');
-      impact =
-        '<div class="impact">' +
-          '<div class="impact-title">Affected records (' + used + ')</div>' +
-          '<ul>' + list + '</ul>' +
-          (used > 8 ? '<div class="hint" style="padding-left:18px">and ' + (used - 8) + ' more&hellip;</div>' : '') +
-        '</div>';
-    }
+    var used = Store.usageCount(v.id);
 
     var html = used
-      ? '<p>This variable is currently being used by <b>' + used + '</b> existing Finish &amp; UC Code ' +
-        UI.plural(used, 'record', 'records') + '.</p>' +
-        '<p>If you delete it, the <b>' + UI.esc(sec.label) + '</b> value of ' +
-        UI.plural(used, 'that record', 'those records') + ' will be left blank. ' +
-        'The records themselves and their other fields are not affected.</p>' +
-        impact +
-        '<p style="margin-top:12px">Are you sure you want to continue?</p>' +
-        '<p class="muted">If you only want to stop offering it for new records, use <b>Disable</b> instead.</p>'
-      : '<p><b>' + UI.esc(v.name) + '</b> will be permanently removed from the <b>' +
-        UI.esc(sec.label) + '</b> section.</p>' +
-        '<p>It is not used by any existing record, so no historical data is affected.</p>';
+      ? '<p>It is used by <b>' + used + '</b> registered ' + UI.plural(used, 'finish', 'finishes') +
+        '. Deleting it leaves that field blank on ' + UI.plural(used, 'it', 'them') + '.</p>'
+      : '<p>This value will be permanently deleted.</p>';
 
     UI.confirm({
       title: 'Delete variable?',
@@ -246,11 +208,7 @@ var VariablesView = (function () {
       Api.variables.remove(v.id)
         .then(function (res) {
           return Store.refresh().then(function () {
-            UI.toast('"' + res.name + '" deleted' + (res.clearedRecords
-              ? ' — ' + res.clearedRecords + ' ' + UI.plural(res.clearedRecords, 'record', 'records') +
-                ' left with an empty ' + sec.label + ' field.'
-              : '.'),
-              res.clearedRecords ? 'warn' : 'success');
+            UI.toast('"' + res.name + '" deleted.', res.clearedRecords ? 'warn' : 'success');
           });
         })
         .catch(function (e) { UI.toast(e.message, 'error'); });
